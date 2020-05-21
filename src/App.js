@@ -1,49 +1,21 @@
 import React from 'react';
-import axios from 'axios';
-import Movie from './Movie';
+import {HashRouter, Route} from 'react-router-dom';
+import Home from './routes/Home';
+import About from './routes/About';
+import Detail from './routes/Detail';
+import Navigation from './components/Navigation';
 
-class App extends React.Component {
-    state = {
-        isLoading: true,
-        movies: []
-    };
-    // axois로 데이터를 받아오기 위해서 시간이 걸리기때문에 async를 이용해 비동기식으로 처리해야한다.
-    // 즉, async await를 하는 이유는 기본적으로 JS에게 getMovies func에게 조금 시간이 b필요하고 그것을 기다려야 한다고 말해주고 있는 것
-    getMovies = async () => {
-        const {
-            data: {
-                data: {
-                    movies
-                }
-            }
-        } = await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating");
-        // state의 movies : getMovies의 movies (from axios) 그냥 {movies} 라고 써도 됨
-        this.setState({movies: movies, isLoading: false});
-    };
-
-    componentDidMount() {
-        this.getMovies();
-    }
-    render() {
-        const {isLoading, movies} = this.state;
-        return (
-            <div>
-                {
-                    isLoading
-                        ? "Loading"
-                        : movies.map(movie => (
-                            <Movie
-                                key={movie.id}
-                                id={movie.id}
-                                year={movie.year}
-                                title={movie.title}
-                                summary={movie.summary}
-                                poster={movie.medium_cover_image}/>
-                        ))
-                }
-            </div>
-        );
-    }
+function App() {
+    return <HashRouter>
+        <Navigation/> {/* about 이라는 path로 가면 About이라는 component를 보여줌 */}
+        {/* exact={true}를 하는 이유
+            그냥 path="/"를 하면 라우터가 url을 인식하면서
+            /가 들어간 모든 라우터를 보여주기 때문에 오직 "/" 만 들어간 라우터를 연결하겠다를 의미 */
+        }
+        <Route path="/" exact={true} component={Home}/>
+        <Route path="/about" component={About}/>
+        <Route path="/movie/:id" component={Detail}/>
+    </HashRouter>
 }
 
 export default App;
